@@ -1,5 +1,4 @@
 <script lang="ts">
-  window.global ||= window;
   import type { Conversation } from "@xmtp/xmtp-js";
   import { xmtpClient } from '$lib/stores'
   import { goto } from "$app/navigation"
@@ -21,7 +20,7 @@
 
   function formatEthAddress(address) {
     if (typeof address !== 'string' || address.length < 10) {
-      throw new Error('Invalid Ethereum address');
+      return "Loading";
     }
 
     const firstFour = address.slice(0, 6);

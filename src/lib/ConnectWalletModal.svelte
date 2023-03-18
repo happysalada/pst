@@ -1,5 +1,4 @@
 <script lang="ts">
-  window.global ||= window;
   import {
     defaultEvmStores,
     connected,

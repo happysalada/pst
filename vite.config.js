@@ -54,9 +54,9 @@ const config = {
 
   optimizeDeps: {
     esbuildOptions: {
-      // define: {
-      //   global: "globalThis",
-      // },
+      define: {
+        global: "globalThis",
+      },
       plugins: [
         NodeGlobalsPolyfillPlugin({
           process: true,

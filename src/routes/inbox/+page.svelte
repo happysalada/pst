@@ -1,3 +1,13 @@
+<script lang="ts">
+  import { Client } from '@xmtp/xmtp-js'
+  import { selectedAccount, connected } from 'svelte-web3'
+
+  selectedAccount.subscribe(async $selectedAccount => {
+    if (!$selectedAccount) return
+    // Create the client with your wallet. This will connect to the XMTP development network by default
+    // const xmtp = await Client.create($selectedAccount)
+  })
+</script>
 <section
   class="flex flex-col justify-center antialiased bg-gray-50 text-gray-600 min-h-screen p-4"
 >

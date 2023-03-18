@@ -1,3 +1,12 @@
+<script lang="ts">
+  import { selectedAccount, connected } from 'svelte-web3'
+  import { goto } from "$app/navigation"
+  import ConnectWalletModal from '$lib/ConnectWalletModal.svelte'
+
+	if ($connected && $selectedAccount) {
+		goto("/inbox")
+	}
+</script>
 <div class="bg-white">
   <header class="absolute inset-x-0 top-0 z-50">
     <nav
@@ -54,9 +63,7 @@
         >
       </div>
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-        <a href="#" class="text-sm font-semibold leading-6 text-gray-900"
-          >Log in <span aria-hidden="true">&rarr;</span></a
-        >
+        <ConnectWalletModal loginText="Log in" styles="text-sm font-semibold leading-6 text-gray-900"/>
       </div>
     </nav>
     <!-- Mobile menu, show/hide based on menu open state. -->
@@ -167,14 +174,8 @@
           Ephemeral, encrypted wallet-to-wallet messaging
         </h1>
         <div class="mt-10 flex items-center justify-center gap-x-6">
-          <a
-            href="/inbox"
-            class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >Connect wallet</a
-          >
-          <a href="/inbox" class="text-sm font-semibold leading-6 text-gray-900"
-            >Send a message<span aria-hidden="true">→</span></a
-          >
+          <ConnectWalletModal loginText="Connect wallet" styles="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"/>
+          <ConnectWalletModal loginText="Send a message" styles="text-sm font-semibold leading-6 text-gray-900"/>
         </div>
       </div>
     </div>

@@ -5,9 +5,6 @@ import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfil
 
 /** @type {import('vite').UserConfig} */
 const config = {
-  define: {
-    global: {},
-  },
   plugins: [sveltekit(), ViteImageOptimizer({})],
 
  // TODO: these might not be needed if you arent using them in your code files

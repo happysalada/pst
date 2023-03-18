@@ -1,4 +1,5 @@
 <script lang="ts">
+  window.global ||= window;
   import { xmtpClient } from '$lib/stores'
   import { goto } from "$app/navigation"
   import { onMount } from "svelte";

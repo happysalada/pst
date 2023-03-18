@@ -1,25 +1,30 @@
 <script lang="ts">
   import type { Conversation } from "@xmtp/xmtp-js";
-  import { xmtpClient } from '$lib/stores'
-  import { goto } from "$app/navigation"
+  import { xmtpClient } from "$lib/stores";
+  import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { signerAddress } from "ethers-svelte";
+  import { clickOutside } from "$lib/click_outside.js";
 
   // TODO find a way to cache conversations from different wallets
   // import { conversations } from "$lib/stores"
 
   let conversations: Conversation[] = [];
+  let modalOpen = false;
+
+  let newConversationPeerAddress: string;
+  let newConversationFirstMessage: string;
 
   onMount(async () => {
     if ($xmtpClient) {
-      conversations = await $xmtpClient.conversations.list()
+      conversations = await $xmtpClient.conversations.list();
     } else {
-      goto("/")
+      goto("/");
     }
   });
 
-  function formatEthAddress(address) {
-    if (typeof address !== 'string' || address.length < 10) {
+  function formatEthAddress(address: string) {
+    if (typeof address !== "string" || address.length < 10) {
       return "Loading";
     }
 
@@ -28,8 +33,148 @@
 
     return `${firstFour}...${lastFour}`;
   }
-
 </script>
+
+<div
+  class="relative z-10"
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+  class:hidden={!modalOpen}
+>
+  <!--
+    Background backdrop, show/hide based on modal state.
+
+    Entering: "ease-out duration-300"
+      From: "opacity-0"
+      To: "opacity-100"
+    Leaving: "ease-in duration-200"
+      From: "opacity-100"
+      To: "opacity-0"
+  -->
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+
+  <div class="fixed inset-0 z-10 overflow-y-auto">
+    <div
+      class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+    >
+      <!--
+        Modal panel, show/hide based on modal state.
+
+        Entering: "ease-out duration-300"
+          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          To: "opacity-100 translate-y-0 sm:scale-100"
+        Leaving: "ease-in duration-200"
+          From: "opacity-100 translate-y-0 sm:scale-100"
+          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      -->
+      <div
+        class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6"
+        use:clickOutside on:outclick={() => (modalOpen = false)}
+      >
+        <div>
+          <div
+            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100"
+          >
+            <svg
+              class="h-6 w-6 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.5 12.75l6 6 9-13.5"
+              />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-5">
+            <h3
+              class="text-base font-semibold leading-6 text-gray-900"
+              id="modal-title"
+            >
+              Create a new conversation
+            </h3>
+
+            <!--
+              This example requires some changes to your config:
+  
+              ```
+              // tailwind.config.js
+              module.exports = {
+                // ...
+                plugins: [
+                  // ...
+                  require('@tailwindcss/forms'),
+                ],
+              }
+              ```
+            -->
+            <form class="space-y-8 divide-y divide-gray-200">
+              <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+                <div class="space-y-6 sm:space-y-5">
+                  <div class="space-y-6 sm:space-y-5">
+                    <div
+                      class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5"
+                    >
+                      <label
+                        for="username"
+                        class="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5"
+                        >Peer Address</label
+                      >
+                      <div class="mt-2 sm:col-span-2 sm:mt-0">
+                        <div class="flex max-w-lg rounded-md shadow-sm">
+                          <input
+                            type="text"
+                            name="peerAddress"
+                            id="peerAddress"
+                            autocomplete="peerAddress"
+                            class="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            bind:value={newConversationPeerAddress}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5"
+                    >
+                      <label
+                        for="about"
+                        class="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5"
+                        >Message</label
+                      >
+                      <div class="mt-2 sm:col-span-2 sm:mt-0">
+                        <textarea
+                          id="about"
+                          name="about"
+                          rows="3"
+                          class="block w-full max-w-lg rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
+                          bind:value={newConversationFirstMessage}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="mt-5 sm:mt-6">
+          <button
+            type="button"
+            class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >Send</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <section
   class="flex flex-col justify-center antialiased bg-gray-50 text-gray-600 min-h-screen p-4"
 >
@@ -57,7 +202,9 @@
                 class="inline-flex text-gray-800 hover:text-gray-900"
                 href="#0"
               >
-                <h2 class="text-xl leading-snug font-bold">{formatEthAddress($signerAddress)}</h2>
+                <h2 class="text-xl leading-snug font-bold">
+                  {formatEthAddress($signerAddress)}
+                </h2>
               </a>
             </div>
           </div>
@@ -85,32 +232,33 @@
         <!-- Chat list -->
         <div class="divide-y divide-gray-200">
           <!-- User -->
-          {#each conversations as {peerAddress, createdAt}}
-          <button
-            class="w-full text-left py-2 focus:outline-none focus-visible:bg-indigo-50"
-          >
-            <div class="flex items-center">
-              <img
-                class="rounded-full items-start flex-shrink-0 mr-3"
-                src=""
-                width="32"
-                height="32"
-                alt="Marie Zulfikar"
-              />
-              <div>
-                <h4 class="text-sm font-semibold text-gray-900">
-                  {peerAddress}
-                </h4>
-                <div class="text-[13px]">The video chat ended · 2hrs</div>
+          {#each conversations as { peerAddress, createdAt }}
+            <button
+              class="w-full text-left py-2 focus:outline-none focus-visible:bg-indigo-50"
+            >
+              <div class="flex items-center">
+                <img
+                  class="rounded-full items-start flex-shrink-0 mr-3"
+                  src=""
+                  width="32"
+                  height="32"
+                  alt="Marie Zulfikar"
+                />
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-900">
+                    {peerAddress}
+                  </h4>
+                  <div class="text-[13px]">The video chat ended · 2hrs</div>
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
           {/each}
         </div>
       </div>
       <!-- Bottom right button -->
       <button
         class="absolute bottom-5 right-5 inline-flex items-center text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded-full text-center px-3 py-2 shadow-lg focus:outline-none focus-visible:ring-2"
+        on:click={() => (modalOpen = true)}
       >
         <svg
           class="w-3 h-3 fill-current text-indigo-300 flex-shrink-0 mr-2"

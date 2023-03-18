@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { selectedAccount, connected } from 'svelte-web3'
+  import { connected, signerAddress } from 'ethers-svelte'
   import { goto } from "$app/navigation"
   import ConnectWalletModal from '$lib/ConnectWalletModal.svelte'
 
-	if ($connected && $selectedAccount) {
+	if ($connected && $signerAddress) {
 		goto("/inbox")
 	}
 </script>

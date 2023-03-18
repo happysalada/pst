@@ -2,9 +2,12 @@
   import {
     defaultEvmStores,
     connected,
+    signer,
   } from "ethers-svelte";
   import { goto } from "$app/navigation";
   import Web3Modal from "web3modal";
+  import { xmtpClient } from "$lib/stores";
+  import { Client } from "@xmtp/xmtp-js";
   // import { variables } from "$lib/variables";
   // import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
   // const WalletConnectProvider = window.WalletConnectProvider.default;
@@ -36,11 +39,18 @@
     });
     const provider = await web3Modal.connect();
     defaultEvmStores.setProvider(provider);
+
+    signer.subscribe(async $signer => {
+      if (!$signer) return
+      // Create the client with your wallet. This will connect to the XMTP development network by default
+      const xmtp = await Client.create($signer, { env: "production"});
+      xmtpClient.set(xmtp);
+    })
   };
   const login = async () => {
     goto("/inbox");
   };
-  $: if ($connected) login();
+  $: if ($connected && $xmtpClient) login();
 </script>
 
 {#if $connected}

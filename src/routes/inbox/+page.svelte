@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { Client } from '@xmtp/xmtp-js'
-  import { signer } from 'ethers-svelte'
+  import { xmtpClient } from '$lib/stores'
+  import { goto } from "$app/navigation"
+  import { onMount } from "svelte";
 
-  signer.subscribe(async $signer => {
-    if (!$signer) return
-    // Create the client with your wallet. This will connect to the XMTP development network by default
-    const xmtp = await Client.create($signer)
-    const conversations = await xmtp.conversations.list()
-    console.log(conversations);
-  })
+  onMount(async () => {
+    if ($xmtpClient) {
+      const conversations = await $xmtpClient.conversations.list()
+      console.log(conversations)
+    } else {
+      goto("/")
+    }
+  });
 </script>
 <section
   class="flex flex-col justify-center antialiased bg-gray-50 text-gray-600 min-h-screen p-4"

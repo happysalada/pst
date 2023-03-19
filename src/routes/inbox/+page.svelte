@@ -1,15 +1,16 @@
 <script lang="ts">
-  import type { Conversation } from "@xmtp/xmtp-js";
+  import type { Conversation, Message } from "@xmtp/xmtp-js";
   import { xmtpClient } from "$lib/stores";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { signerAddress } from "ethers-svelte";
-  import { clickOutside } from "$lib/click_outside.js";
+  import { clickOutside, timeFromNow } from "$lib/utils.js";
 
   // TODO find a way to cache conversations from different wallets
   // import { conversations } from "$lib/stores"
 
   let conversations: Conversation[] = [];
+  let messages: Record<string, Message> = {};
   let modalOpen = false;
 
   let newConversationPeerAddress: string;
@@ -18,6 +19,12 @@
   onMount(async () => {
     if ($xmtpClient) {
       conversations = await $xmtpClient.conversations.list();
+      conversations.forEach(async conversation => {
+        const [message] = await conversation.messages({ limit: 1});
+        if (message) {
+          messages[conversation.topic] = message;
+        }
+      })
     } else {
       goto("/");
     }
@@ -32,6 +39,16 @@
     const lastFour = address.slice(-4);
 
     return `${firstFour}...${lastFour}`;
+  }
+
+  async function createConversation() {
+    if (!$xmtpClient) return;
+    modalOpen = false;
+    console.log(newConversationPeerAddress);
+    // TODO figure out why adding a conversationId crashes this
+    const newConversation = await $xmtpClient.conversations.newConversation(newConversationPeerAddress);
+    conversations = [newConversation, ...conversations];
+    await newConversation.send(newConversationFirstMessage);
   }
 </script>
 
@@ -167,6 +184,7 @@
           <button
             type="button"
             class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            on:click={createConversation}
             >Send</button
           >
         </div>
@@ -232,11 +250,12 @@
         <!-- Chat list -->
         <div class="divide-y divide-gray-200">
           <!-- User -->
-          {#each conversations as { peerAddress, createdAt }}
+          {#each conversations as { peerAddress, createdAt, topic }}
             <button
               class="w-full text-left py-2 focus:outline-none focus-visible:bg-indigo-50"
             >
               <div class="flex items-center">
+                <!-- TODO make the profile more colourful
                 <img
                   class="rounded-full items-start flex-shrink-0 mr-3"
                   src=""
@@ -244,11 +263,15 @@
                   height="32"
                   alt="Marie Zulfikar"
                 />
+                -->
                 <div>
-                  <h4 class="text-sm font-semibold text-gray-900">
-                    {peerAddress}
+                  <h4 class="text-sm text-gray-500">
+                    {formatEthAddress(peerAddress)}
                   </h4>
-                  <div class="text-[13px]">The video chat ended · 2hrs</div>
+                  <h4 class="text-md font-semibold text-gray-900">
+                    {messages[topic] && messages[topic].content || "Loading..."}
+                  </h4>
+                  <div class="text-[13px]">{timeFromNow(createdAt)}</div>
                 </div>
               </div>
             </button>

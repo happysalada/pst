@@ -4,3 +4,4 @@ import { writable } from 'svelte/store';
 
 export const user = persisted('user', undefined);
 export const xmtpClient = writable(null);
+export const conversations = persisted('conversations', []);

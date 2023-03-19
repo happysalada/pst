@@ -15,6 +15,7 @@
 
   let newConversationPeerAddress: string;
   let newConversationFirstMessage: string;
+  let inviteLink: string;
 
   onMount(async () => {
     if ($xmtpClient) {
@@ -41,14 +42,14 @@
     return `${firstFour}...${lastFour}`;
   }
 
-  async function createConversation() {
+  async function createConversation(): Promise<void> {
     if (!$xmtpClient) return;
-    modalOpen = false;
-    console.log(newConversationPeerAddress);
     // TODO figure out why adding a conversationId crashes this
     const newConversation = await $xmtpClient.conversations.newConversation(newConversationPeerAddress);
     conversations = [newConversation, ...conversations];
     await newConversation.send(newConversationFirstMessage);
+    let timestamp = newConversation.createdAt.getTime();
+    inviteLink = `https://pst.sassy.technology/invite/${timestamp}`;
   }
 </script>
 
@@ -87,8 +88,38 @@
       -->
       <div
         class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6"
-        use:clickOutside on:outclick={() => (modalOpen = false)}
+        use:clickOutside on:outclick={() => {modalOpen = false; inviteLink = ""}}
       >
+        {#if inviteLink}
+        <div>
+          <div
+            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100"
+          >
+            <svg
+              class="h-6 w-6 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.5 12.75l6 6 9-13.5"
+              />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-5">
+            <h3
+              class="text-base font-semibold leading-6 text-gray-900"
+              id="modal-title"
+            >
+              Your invite link is {inviteLink}
+            </h3>
+          </div>
+        </div>
+        {:else}
         <div>
           <div
             class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100"
@@ -188,6 +219,7 @@
             >Send</button
           >
         </div>
+        {/if}
       </div>
     </div>
   </div>

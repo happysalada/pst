@@ -1,3 +1,21 @@
+<script lang="ts">
+  import { connected, signerAddress } from 'ethers-svelte'
+  import { goto } from "$app/navigation"
+  import { xmtpClient } from "$lib/stores";
+  import ConnectWalletModal from '$lib/ConnectWalletModal.svelte'
+	import type { PageData } from './$types';
+	import type { Conversation } from '@xmtp/xmtp-js'
+
+	export let data: PageData;
+	if ($connected && $signerAddress && $xmtpClient) {
+		let conversation = $xmtpClient.conversations.list().find((conversation: Conversation) => conversation.createdAt.getTime().toString() == data.timestamp); 
+		if (!conversation) {
+			console.log("conversation not found for this user")
+		} else {
+			goto(`/conversation/${data.timestamp}`)
+		}
+	}
+</script>
 <div class="bg-white">
 	<header class="absolute inset-x-0 top-0 z-50">
 		<nav
@@ -91,11 +109,7 @@
 							>
 						</div>
 						<div class="py-6">
-							<a
-								href="#"
-								class="-mx-3 block rounded-lg py-2.5 px-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-								>Log in</a
-							>
+			        <ConnectWalletModal loginText="Connect wallet" styles="-mx-3 block rounded-lg py-2.5 px-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"/>
 						</div>
 					</div>
 				</div>
@@ -143,11 +157,7 @@
 				</p>
 
 				<div class="mt-10 flex items-center justify-center gap-x-6">
-					<a
-						href="/inbox"
-						class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Connect wallet</a
-					>
+	        <ConnectWalletModal loginText="Log in" styles="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"/>
 				</div>
 			</div>
 		</div>

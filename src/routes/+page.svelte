@@ -5,6 +5,10 @@
   import { xmtpClient } from "$lib/stores";
   import { Client } from "@xmtp/xmtp-js";
 
+  // attempt Buffer is not defined fix
+  import { Buffer } from "buffer/";
+  window.Buffer = window.Buffer || Buffer;
+
   signer.subscribe(async $signer => {
     if (!$signer) return
     // Create the client with your wallet. This will connect to the XMTP development network by default

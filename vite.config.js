@@ -12,7 +12,7 @@ const config = {
     alias: {
       util: "rollup-plugin-node-polyfills/polyfills/util",
       sys: "util",
-      buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
+      // buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
       // events: "rollup-plugin-node-polyfills/polyfills/events",
       stream: "rollup-plugin-node-polyfills/polyfills/stream",
       path: "rollup-plugin-node-polyfills/polyfills/path",

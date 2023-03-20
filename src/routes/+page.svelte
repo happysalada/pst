@@ -1,11 +1,17 @@
 <script lang="ts">
-  import { connected, signerAddress } from 'ethers-svelte'
+  import { signer } from 'ethers-svelte'
   import { goto } from "$app/navigation"
   import ConnectWalletModal from '$lib/ConnectWalletModal.svelte'
+  import { xmtpClient } from "$lib/stores";
+  import { Client } from "@xmtp/xmtp-js";
 
-	if ($connected && $signerAddress) {
-		goto("/inbox")
-	}
+  signer.subscribe(async $signer => {
+    if (!$signer) return
+    // Create the client with your wallet. This will connect to the XMTP development network by default
+    const xmtp = await Client.create($signer, { env: "production"});
+    xmtpClient.set(xmtp);
+    goto("/inbox");
+  })
 </script>
 <div class="bg-white">
   <header class="absolute inset-x-0 top-0 z-50">

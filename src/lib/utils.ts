@@ -47,3 +47,14 @@ export function clickOutside(node: HTMLElement): ClickOutsideAction {
 		}
 	};
 }
+
+export function formatEthAddress(address: string) {
+  if (typeof address !== "string" || address.length < 10) {
+    return "Loading";
+  }
+
+  const firstFour = address.slice(0, 6);
+  const lastFour = address.slice(-4);
+
+  return `${firstFour}...${lastFour}`;
+}

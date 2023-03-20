@@ -4,7 +4,7 @@
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { signerAddress } from "ethers-svelte";
-  import { clickOutside, timeFromNow } from "$lib/utils.js";
+  import { clickOutside, timeFromNow, formatEthAddress } from "$lib/utils.js";
 
   // TODO find a way to cache conversations from different wallets
   // import { conversations } from "$lib/stores"
@@ -30,17 +30,6 @@
       goto("/");
     }
   });
-
-  function formatEthAddress(address: string) {
-    if (typeof address !== "string" || address.length < 10) {
-      return "Loading";
-    }
-
-    const firstFour = address.slice(0, 6);
-    const lastFour = address.slice(-4);
-
-    return `${firstFour}...${lastFour}`;
-  }
 
   async function createConversation(): Promise<void> {
     if (!$xmtpClient) return;
@@ -250,7 +239,7 @@
             <div class="pr-1">
               <a
                 class="inline-flex text-gray-800 hover:text-gray-900"
-                href="#0"
+                href="#"
               >
                 <h2 class="text-xl leading-snug font-bold">
                   {formatEthAddress($signerAddress)}
@@ -283,8 +272,9 @@
         <div class="divide-y divide-gray-200">
           <!-- User -->
           {#each conversations as { peerAddress, createdAt, topic }}
-            <button
+            <a
               class="w-full text-left py-2 focus:outline-none focus-visible:bg-indigo-50"
+              href={`/conversation/${createdAt.getTime()}`}
             >
               <div class="flex items-center">
                 <!-- TODO make the profile more colourful
@@ -306,7 +296,7 @@
                   <div class="text-[13px]">{timeFromNow(createdAt)}</div>
                 </div>
               </div>
-            </button>
+            </a>
           {/each}
         </div>
       </div>

@@ -1,21 +1,26 @@
 <script lang="ts">
-  import { connected, signerAddress } from 'ethers-svelte'
-  import { goto } from "$app/navigation"
-  import { xmtpClient } from "$lib/stores";
-  import ConnectWalletModal from '$lib/ConnectWalletModal.svelte'
-	import type { PageData } from './$types';
-	import type { Conversation } from '@xmtp/xmtp-js'
+	import { connected, signerAddress } from "ethers-svelte";
+	import { goto } from "$app/navigation";
+	import { xmtpClient } from "$lib/stores";
+	import ConnectWalletModal from "$lib/ConnectWalletModal.svelte";
+	import type { PageData } from "./$types";
+	import type { Conversation } from "@xmtp/xmtp-js";
 
 	export let data: PageData;
 	if ($connected && $signerAddress && $xmtpClient) {
-		let conversation = $xmtpClient.conversations.list().find((conversation: Conversation) => conversation.createdAt.getTime().toString() == data.timestamp); 
+		let conversations = $xmtpClient.conversations .list();
+		let conversation = conversations.find(
+				(conversation: Conversation) =>
+					conversation.createdAt.getTime().toString() == data.timestamp
+			);
 		if (!conversation) {
-			console.log("conversation not found for this user")
+			goto(`/inbox`);
 		} else {
-			goto(`/conversation/${data.timestamp}`)
+			goto(`/conversation/${data.timestamp}`);
 		}
 	}
 </script>
+
 <div class="bg-white">
 	<header class="absolute inset-x-0 top-0 z-50">
 		<nav
@@ -60,9 +65,10 @@
 				>
 			</div>
 			<div class="hidden lg:flex lg:flex-1 lg:justify-end">
-				<a href="#" class="text-sm font-semibold leading-6 text-gray-900"
-					>Log in <span aria-hidden="true">&rarr;</span></a
-				>
+				<ConnectWalletModal
+					loginText="Connect wallet"
+					styles="text-sm font-semibold leading-6 text-gray-900"
+				/>
 			</div>
 		</nav>
 		<!-- Mobile menu, show/hide based on menu open state. -->
@@ -109,7 +115,10 @@
 							>
 						</div>
 						<div class="py-6">
-			        <ConnectWalletModal loginText="Connect wallet" styles="-mx-3 block rounded-lg py-2.5 px-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"/>
+							<ConnectWalletModal
+								loginText="Connect wallet"
+								styles="-mx-3 block rounded-lg py-2.5 px-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+							/>
 						</div>
 					</div>
 				</div>
@@ -157,7 +166,10 @@
 				</p>
 
 				<div class="mt-10 flex items-center justify-center gap-x-6">
-	        <ConnectWalletModal loginText="Log in" styles="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"/>
+					<ConnectWalletModal
+						loginText="Connect wallet"
+						styles="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+					/>
 				</div>
 			</div>
 		</div>

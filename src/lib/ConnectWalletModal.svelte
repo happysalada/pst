@@ -13,6 +13,10 @@
   // const WalletConnectProvider = window.WalletConnectProvider.default;
   // import WalletConnectProvider from "@walletconnect/web3-provider";
 
+  import { Buffer } from "buffer";
+
+  window.Buffer = Buffer;
+
   export let loginText: string;
   export let styles: string;
   let loading = false;

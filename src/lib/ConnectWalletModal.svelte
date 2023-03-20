@@ -13,12 +13,18 @@
   // const WalletConnectProvider = window.WalletConnectProvider.default;
   // import WalletConnectProvider from "@walletconnect/web3-provider";
 
+  import { Buffer } from "buffer";
+
+  window.Buffer = Buffer;
+
   export let loginText: string;
   export let styles: string;
+  export let loading = false;
 
   const disable = () => defaultEvmStores.disconnect();
   let web3Modal;
   const enable = async () => {
+    loading = true;
     if (web3Modal) web3Modal.clearCachedProvider();
     web3Modal = new Web3Modal({
       cacheProvider: false,
@@ -53,14 +59,18 @@
   $: if ($connected && $xmtpClient) login();
 </script>
 
-{#if $connected}
-  <button
-    class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50"
-    on:click={disable}>Logout</button
-  >
+{#if loading}
+  <p> Loading... </p>
 {:else}
-  <button
-    class={styles}
-    on:click={enable}>{loginText}</button
-  >
+  {#if $connected}
+    <button
+      class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50"
+      on:click={disable}>Logout</button
+    >
+  {:else}
+    <button
+      class={styles}
+      on:click={enable}>{loginText}</button
+    >
+  {/if}
 {/if}

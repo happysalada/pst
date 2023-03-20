@@ -5,6 +5,11 @@
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<script> global = globalThis; </script>
+		<script type="module">
+      import { Buffer } from "buffer";
+
+      window.Buffer = Buffer;
+    </script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

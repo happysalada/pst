@@ -44,6 +44,7 @@
 	"type": "module",
 	"dependencies": {
 		"@xmtp/xmtp-js": "^7.14.0",
+		"buffer": "^6.0.3",
 		"ethers-svelte": "^3.0.0",
 		"surrealdb.js": "^0.5.0",
 		"svelte-local-storage-store": "^0.4.0",
